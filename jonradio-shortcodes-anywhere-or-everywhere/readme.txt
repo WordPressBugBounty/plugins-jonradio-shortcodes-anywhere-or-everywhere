@@ -1,8 +1,8 @@
 === Shortcodes Anywhere or Everywhere ===
 Contributors: adiant, dgewirtz
 Tags: shortcode, custom
-Tested up to: 6.6
-Stable tag: 1.4.2
+Tested up to: 6.7
+Stable tag: 1.4.3
 License: GPL-3.0+
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -53,13 +53,11 @@ This section describes how to install the *jonradio Shortcodes Anywhere or Every
 1. View the Settings page, either by clicking on the **Settings** link in the entry for this plugin shown in the Installed Plugins Admin panel in WordPress, or from the Admin menu, **Settings-Shortcodes Anywhere or Everywhere**.
 1. Select where Shortcodes will be used, and click the Save Changes button.
 
-== Frequently Asked Questions ==
-
-= Where should Feature Requests be sent? =
-
-Support has moved to the ZATZLabs site and is no longer provided on the WordPress.org forums. Please visit the new [ZATZLabs Forums](http://zatzlabs.com/forums/). If you need a timely reply from the developer, please [open a ticket](http://zatzlabs.com/submit-ticket/). There's a field on the support ticket specifically for feature requests.
-
 == Changelog ==
+
+= 1.4.3 =
+* Remove translation from get_plugin_data() for WordPress 6.7 compatibility
+* Correct corrupt Settings, if found
 
 = 1.4.2 =
 * Minor support update
@@ -88,6 +86,9 @@ Support has moved to the ZATZLabs site and is no longer provided on the WordPres
 * Beta Version
 
 == Upgrade Notice ==
+
+= 1.4.3 =
+Support WordPress Version 6.7
 
 = 1.4.1 =
 Error Messages for Priority Settings

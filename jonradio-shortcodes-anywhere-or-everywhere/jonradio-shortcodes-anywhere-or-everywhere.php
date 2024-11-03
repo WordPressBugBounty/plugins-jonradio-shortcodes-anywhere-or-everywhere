@@ -10,7 +10,7 @@
  * Plugin Name:       Shortcodes Anywhere or Everywhere
  * Plugin URI:        https://installactivatego.com
  * Description:       Allows Shortcodes to be used nearly everywhere, not just in posts and pages.
- * Version:           1.4.2
+ * Version:           1.4.3
  * Requires at least: 6.0
  * Requires PHP:      5.6
  * Author:            InstallActivateGo.com
@@ -127,10 +127,11 @@ if ( !function_exists( 'get_plugin_data' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 }
 global $jr_saoe_plugin_data;
-$jr_saoe_plugin_data = get_plugin_data( __FILE__ );
+/*	Turn off Markup and Translation of Plugin Data
+	to prevent call to _get_plugin_data_markup_translate()
+*/
+$jr_saoe_plugin_data = get_plugin_data( __FILE__, FALSE, FALSE );
 $jr_saoe_plugin_data['slug'] = basename( dirname( __FILE__ ) );
-
-require_once( jr_saoe_path() . 'includes/common-functions.php' );
 
 global $jr_saoe_plugin_basename;
 $jr_saoe_plugin_basename = plugin_basename( __FILE__ );
@@ -148,7 +149,76 @@ function jr_saoe_plugin_basename() {
 	
 if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
 } else {
-	jr_v1_validate_settings( 'jr_saoe_settings', $jr_saoe_settings_default );
+	function jr_saoe_validate_wp_settings( $name, $defaults, $blog_id = 0 ) {
+		switch ( $blog_id ) {
+			case 0:
+				$settings = get_option( $name );
+				break;
+			case -1:
+				$settings = get_site_option( $name );
+				break;
+			default:
+				$settings = get_blog_option( $blog_id, $name );
+		}
+		
+		$updated = FALSE;
+		if ( is_array( $settings ) ) {
+			/*	Add any missing Settings, and set to Default values.
+			*/
+			foreach ( $defaults as $key => $value ) {
+				if ( !isset( $settings[$key] ) ) {
+					$settings[$key] = $value;
+					$updated = TRUE;
+				} else {
+					if ( is_array( $value ) ) {
+						foreach ( $value as $key2 => $value2 ) {
+							if ( !isset( $settings[$key][$key2] ) ) {
+								$settings[$key][$key2] = $value;
+								$updated = TRUE;
+							}
+						}
+					}
+				}
+			}
+			/*	Remove any Settings not found in Defaults provided.
+			*/
+			foreach ( $settings as $key => $value ) {
+				if ( !isset( $defaults[$key] ) ) {
+					unset( $settings[$key] );
+					$updated = TRUE;
+				} else {
+					if ( is_array( $value ) ) {
+						foreach ( $value as $key2 => $value2 ) {
+							if ( !isset( $defaults[$key][$key2] ) ) {
+								$defaults[$key][$key2] = $value;
+								$updated = TRUE;
+							}
+						}
+					}
+				}
+			}
+		} else {
+			$settings = $defaults;
+			$updated = TRUE;
+		}
+		
+		if ( $updated ) {
+			switch ( $blog_id ) {
+				case 0:
+					$return = update_option( $name, $settings );
+					break;
+				case -1:
+					$return = update_site_option( $name, $settings );
+					break;
+				default:
+					$return = update_blog_option( $blog_id, $name, $settings );
+			}
+		} else {
+			$return = NULL;
+		}
+		return $return;
+	}
+	jr_saoe_validate_wp_settings( 'jr_saoe_settings', $jr_saoe_settings_default );
 	if ( is_admin() ) {
 		require_once( jr_saoe_path() . 'includes/admin.php' );
 	} else {
